@@ -17,6 +17,30 @@ class Database:
                 cursor_factory=RealDictCursor)
                 cursor = conn.cursor()
                 print("Database connection was succesfull!")
+
+                cursor.execute("""
+                                CREATE TABLE IF NOT EXISTS public.users (
+                                id serial4 NOT NULL,
+                                "name" varchar NOT NULL,
+                                email varchar NOT NULL,
+                                "password" varchar NOT NULL,
+                                created_at timestamptz NOT NULL DEFAULT now(),
+                                CONSTRAINT users_email_key UNIQUE (email),
+                                CONSTRAINT users_pkey PRIMARY KEY (id)
+                                );
+                                """)
+
+                cursor.execute("""
+                                CREATE TABLE IF NOT EXISTS public.investments (
+                                id serial4 NOT NULL,
+                                investment_name varchar NOT NULL,
+                                "token" varchar NULL,
+                                amount float4 NOT NULL,
+                                opening_at timestamptz NOT NULL DEFAULT now(),
+                                CONSTRAINT investments_pkey PRIMARY KEY (id)
+                                );
+                            """)
+
                 break
             except Exception as error:
                 print("Connecting to Dabase failed")
