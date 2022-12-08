@@ -17,7 +17,7 @@ class ResponseModelInvestment(InvestmentBase):
     id: int    
     opening_at: datetime
 
-#####################################################3 users 
+##################################################### users 
 
 class UserBase(BaseModel):
     name: str
@@ -32,4 +32,8 @@ class ResponseModelUser(BaseModel):
     name: str
     email: EmailStr
     created_at: datetime
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
     
