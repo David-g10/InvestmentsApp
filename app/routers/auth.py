@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, status, HTTPException, Response
+from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from ..config import database
-from .. import schemas, utils
+from .. import schemas, utils, oauth2
 
 
 router = APIRouter(tags=['Authentication'])
@@ -8,20 +9,21 @@ router = APIRouter(tags=['Authentication'])
 conn, cursor = database.Database().connect()
 
 
-@router.post("/login")
-def login(user_credentials: schemas.UserLogin):
+@router.post("/login", response_model= schemas.Token)
+def login(user_credentials: OAuth2PasswordRequestForm = Depends()):
     
-    print(user_credentials.email)
-    cursor.execute("""SELECT email,password FROM users WHERE email = %s""", [user_credentials.email])
+    cursor.execute("""SELECT id,email,password FROM users WHERE email = %s""", [user_credentials.username])
     user = cursor.fetchone()
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Invalid credentials")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Invalid credentials")
 
     if not utils.verify(user_credentials.password, user["password"]):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Invalid credentials")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Invalid credentials")
 
     #create a token
 
+    access_token = oauth2.create_access_token(data = {"user_id" : user["id"]})
+    token_type = "Bearer"
     # return token
 
-    return {"token": "example token"}
+    return {"access_token" : access_token, "token_type": token_type}
