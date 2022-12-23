@@ -16,6 +16,7 @@ class UpdateInvestment(BaseModel):
 class ResponseModelInvestment(InvestmentBase):
     id: int    
     opening_at: datetime
+    user_id: int
 
 ##################################################### users 
 

@@ -3,9 +3,9 @@ from psycopg2.extras import RealDictCursor
 import time
 
 class Database:
-    def __init__(self) -> None:
-        self.conn = self.connect()
-
+#    def __init__(self) -> None:
+#        self.conn = self.connect()
+#
     def connect(self):
 
         cursor = None
@@ -37,14 +37,19 @@ class Database:
                                 "token" varchar NULL,
                                 amount float4 NOT NULL,
                                 opening_at timestamptz NOT NULL DEFAULT now(),
-                                CONSTRAINT investments_pkey PRIMARY KEY (id)
+                                CONSTRAINT investments_pkey PRIMARY KEY (id),
+                                CONSTRAINT investments_fk FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
                                 );
                             """)
 
                 break
             except Exception as error:
-                print("Connecting to Dabase failed")
+                print("Connecting to Database failed")
                 print(f"The error was: {error}")
                 time.sleep(2)
-
         return conn, cursor
+
+    
+    def disconnect(self):
+        self.conn.close()
+        print("conexion cerrada")

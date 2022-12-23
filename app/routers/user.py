@@ -25,7 +25,7 @@ def create_user(user: schemas.CreateUser):
 
 @router.get('/{id}')
 def get_user(id: int):
-    cursor.execute("""SELECT id,name,email,created_at FROM users WHERE id = %s""", (str(id)))
+    cursor.execute("""SELECT id,name,email,created_at FROM users WHERE id = %s""", [str(id)])
     user = cursor.fetchone()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
