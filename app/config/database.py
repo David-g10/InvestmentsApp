@@ -1,19 +1,24 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
+from .config import settings
 
 class Database:
 #    def __init__(self) -> None:
 #        self.conn = self.connect()
 #
-    def connect(self):
+    db_host = settings.DATABASE_HOST
+    db_name = settings.DATABASE_NAME
+    db_user = settings.DATABASE_USER
+    db_password = settings.DATABASE_PASSWORD
 
+    def connect(self):
         cursor = None
         conn = None
 
         while True:
             try:
-                conn = psycopg2.connect(host='localhost', database='investments', user='postgres', password='postgres',
+                conn = psycopg2.connect(host=self.db_host, database=self.db_name, user=self.db_user, password=self.db_password,
                 cursor_factory=RealDictCursor)
                 cursor = conn.cursor()
         
