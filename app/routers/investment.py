@@ -1,7 +1,7 @@
 from app import schemas
-from fastapi import status, HTTPException, Response, APIRouter, Depends
+from fastapi import status, HTTPException, Response, APIRouter, Depends, Query
 from ..config import database
-from typing import List
+from typing import List, Optional
 from .. import oauth2
 
 router = APIRouter(
@@ -12,8 +12,11 @@ router = APIRouter(
 conn, cursor = database.Database().connect()
 
 @router.get("/", response_model=List[schemas.ResponseModelInvestment])
-def get_investments(current_user: int = Depends(oauth2.get_current_user)):
-    cursor.execute("SELECT * FROM investments")
+def get_investments(current_user: int = Depends(oauth2.get_current_user), search_filter: Optional[str] = Query(None, alias="search-filter")):
+    query = f"SELECT * FROM investments WHERE user_id = {current_user['id']}"
+    if search_filter:
+        query += f" AND token = '{search_filter}'"
+    cursor.execute(query)
     investments = cursor.fetchall()
     return investments
 
@@ -29,10 +32,17 @@ def add_investment(investment: schemas.CreateInvestment, current_user: int = Dep
 
 @router.get("/{id}", response_model=schemas.ResponseModelInvestment)
 def get_investment(id: int, current_user: int = Depends(oauth2.get_current_user)):
-    cursor.execute("""SELECT * FROM investments WHERE id = %s""", [str(id)])
-    investment = cursor.fetchone()
-    if not investment:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+
+    cursor.execute("""SELECT user_id FROM investments WHERE id = %s""", [str(id)])
+    investment_id = cursor.fetchone()
+
+    if current_user["id"] != investment_id["user_id"]:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to perform requested action.")
+    else:
+        cursor.execute("""SELECT * FROM investments WHERE id = %s""", [str(id)])
+        investment = cursor.fetchone()
+        if not investment:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"investment with id: {id} was not found.")
     return investment
 

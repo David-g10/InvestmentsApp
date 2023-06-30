@@ -13,11 +13,10 @@ class Database:
 
         while True:
             try:
-                conn = psycopg2.connect(host='localhost', database='investments', user='postgres', password='password',
+                conn = psycopg2.connect(host='localhost', database='investments', user='postgres', password='postgres',
                 cursor_factory=RealDictCursor)
                 cursor = conn.cursor()
-                print("Database connection was succesfull!")
-
+        
                 cursor.execute("""
                                 CREATE TABLE IF NOT EXISTS public.users (
                                 id serial4 NOT NULL,
@@ -29,10 +28,11 @@ class Database:
                                 CONSTRAINT users_pkey PRIMARY KEY (id)
                                 );
                                 """)
-
+                conn.commit()
                 cursor.execute("""
                                 CREATE TABLE IF NOT EXISTS public.investments (
                                 id serial4 NOT NULL,
+                                user_id int NOT NULL,
                                 investment_name varchar NOT NULL,
                                 "token" varchar NULL,
                                 amount float4 NOT NULL,
@@ -41,7 +41,8 @@ class Database:
                                 CONSTRAINT investments_fk FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
                                 );
                             """)
-
+                conn.commit()
+                print("Database connection was succesfull!")
                 break
             except Exception as error:
                 print("Connecting to Database failed")
@@ -53,3 +54,7 @@ class Database:
     def disconnect(self):
         self.conn.close()
         print("conexion cerrada")
+
+if __name__=='__main__':
+    db = Database().connect()
+
