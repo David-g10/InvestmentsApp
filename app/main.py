@@ -5,7 +5,7 @@ from .config.orm_database import get_db
 from .config import orm_models
 from .config.orm_database import engine
 
-orm_models.Base.metadata.create_all(bind=engine)
+# orm_models.Base.metadata.create_all(bind=engine) #uncomment to create the db tables if dont exists.
 
 app = FastAPI()
 
@@ -20,4 +20,5 @@ def root():
 
 @app.get("/ormtest")
 def test(db: Session = Depends(get_db)):
-    return {"db conection:": "success"}
+    users = db.query(orm_models.User).all()
+    return {"data": users}
