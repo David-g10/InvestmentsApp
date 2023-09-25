@@ -9,10 +9,9 @@ router = APIRouter(
     tags=["Investments"]
 )
 
-conn, cursor = database.Database().connect()
-
 @router.get("/", response_model=List[schemas.ResponseModelInvestment])
 def get_investments(current_user: int = Depends(oauth2.get_current_user), search_filter: Optional[str] = Query(None, alias="search-filter")):
+    conn, cursor = database.Database().connect()
     query = f"SELECT * FROM investments WHERE user_id = {current_user['id']}"
     if search_filter:
         query += f" AND token = '{search_filter}'"
@@ -22,6 +21,7 @@ def get_investments(current_user: int = Depends(oauth2.get_current_user), search
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.ResponseModelInvestment)
 def add_investment(investment: schemas.CreateInvestment, current_user: int = Depends(oauth2.get_current_user)):
+    conn, cursor = database.Database().connect()
     print(current_user["id"])
     cursor.execute("""INSERT INTO investments (investment_name, token, amount, user_id) VALUES (%s, %s, %s, %s) RETURNING * """,
                   (investment.investment_name, investment.token, investment.amount,current_user["id"]))
@@ -32,7 +32,7 @@ def add_investment(investment: schemas.CreateInvestment, current_user: int = Dep
 
 @router.get("/{id}", response_model=schemas.ResponseModelInvestment)
 def get_investment(id: int, current_user: int = Depends(oauth2.get_current_user)):
-
+    conn, cursor = database.Database().connect()
     cursor.execute("""SELECT user_id FROM investments WHERE id = %s""", [str(id)])
     investment_id = cursor.fetchone()
 
@@ -49,7 +49,7 @@ def get_investment(id: int, current_user: int = Depends(oauth2.get_current_user)
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_investment(id: int, current_user: int = Depends(oauth2.get_current_user)):
-    
+    conn, cursor = database.Database().connect()
     cursor.execute("""SELECT user_id FROM investments WHERE id = %s""", [str(id)])
     investment_id = cursor.fetchone()
 
@@ -65,7 +65,7 @@ def delete_investment(id: int, current_user: int = Depends(oauth2.get_current_us
 
 @router.put("/{id}", response_model=schemas.ResponseModelInvestment)
 def update_investment(id: int, investment: schemas.UpdateInvestment, current_user: int = Depends(oauth2.get_current_user)):
-    
+    conn, cursor = database.Database().connect()
     cursor.execute("""SELECT user_id FROM investments WHERE id = %s""", [str(id)])
     investment_id = cursor.fetchone()
 

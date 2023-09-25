@@ -7,7 +7,6 @@ from .config import database
 from .config.config import settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
-conn, cursor = database.Database().connect()
 #SECRET KEY
 
 #Algorithm
@@ -43,6 +42,7 @@ def verify_access_token(token: str, credentials_exception):
 
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
+    conn, cursor = database.Database().connect()
     credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                          detail=f"Could not validate credentials",
                                         headers={"WWW-Authenticate": "Bearer"})

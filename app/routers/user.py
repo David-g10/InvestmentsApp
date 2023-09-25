@@ -6,12 +6,10 @@ router = APIRouter(
     prefix="/users",
     tags=["Users"]
 )
-conn, cursor = database.Database().connect()
-
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.ResponseModelUser)
 def create_user(user: schemas.CreateUser):
-
+    conn, cursor = database.Database().connect()
     #hashing the password
     hashed_password = utils.hash(user.password)
     user.password = hashed_password
@@ -25,6 +23,7 @@ def create_user(user: schemas.CreateUser):
 
 @router.get('/{id}')
 def get_user(id: int):
+    conn, cursor = database.Database().connect()
     cursor.execute("""SELECT id,name,email,created_at FROM users WHERE id = %s""", [str(id)])
     user = cursor.fetchone()
     if not user:

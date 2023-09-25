@@ -3,15 +3,11 @@ from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from ..config import database
 from .. import schemas, utils, oauth2
 
-
 router = APIRouter(tags=['Authentication'])
-
-conn, cursor = database.Database().connect()
-
 
 @router.post("/login", response_model= schemas.Token)
 def login(user_credentials: OAuth2PasswordRequestForm = Depends()):
-    
+    conn, cursor = database.Database().connect()
     cursor.execute("""SELECT id,email,password FROM users WHERE email = %s""", [user_credentials.username])
     user = cursor.fetchone()
     if not user:
