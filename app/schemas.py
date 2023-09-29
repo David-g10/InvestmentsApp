@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, conint
 from datetime import datetime
 
 class InvestmentBase(BaseModel):
@@ -45,5 +45,11 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     id: Optional[str] = None
 
+######################## votes #########################
+
+class VoteBase(BaseModel):
+    investment_id: int
+    dir: conint(le=1)
+    
 
     
