@@ -10,6 +10,7 @@ class User(Base):
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    phone_number = Column(String, nullable=True)
 
     investments = relationship("Investment", back_populates="user")
 
