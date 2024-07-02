@@ -1,0 +1,38 @@
+version: "3"
+services: 
+  backend:
+    image: 'backend:${TAG-latest}'
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+    environment:
+      DATABASE_HOST: db
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      SECRET_KEY: ${SECRET_KEY}
+      ALGORITHM: ${ALGORITHM}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
+    env_file:
+      - .env
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"  # Opcional: expone el puerto 5432 en tu máquina host para acceso directo
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persiste los datos entre reinicios del contenedor
+    env_file:
+      - .env    
+
+
+volumes:
+  postgres_data:  # Aquí se define el volumen 'postgres_data'
