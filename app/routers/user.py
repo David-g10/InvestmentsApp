@@ -1,6 +1,7 @@
-from app import schemas, utils
+from app import schemas
 from fastapi import status, HTTPException, APIRouter
 from ..config import database
+from .. import oauth2
 
 router = APIRouter(
     prefix="/users",
@@ -11,7 +12,7 @@ router = APIRouter(
 def create_user(user: schemas.CreateUser):
     conn, cursor = database.Database().connect()
     #hashing the password
-    hashed_password = utils.hash(user.password)
+    hashed_password = oauth2.hash_password(user.password)
     user.password = hashed_password
 
     cursor.execute("""INSERT INTO users (name, email, password) VALUES (%s, %s, %s) RETURNING * """,
