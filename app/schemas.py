@@ -17,7 +17,8 @@ class ResponseModelInvestment(InvestmentBase):
     id: int    
     opening_at: datetime
     user_id: int
-
+    class Config:
+        orm_mode = True
 ##################################################### users 
 
 class UserBase(BaseModel):

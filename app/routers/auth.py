@@ -11,10 +11,10 @@ def login(user_credentials: OAuth2PasswordRequestForm = Depends()):
     cursor.execute("""SELECT id,email,password FROM users WHERE email = %s""", [user_credentials.username])
     user = cursor.fetchone()
     if not user:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Invalid credentials")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid credentials")
 
     if not utils.verify(user_credentials.password, user["password"]):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Invalid credentials")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid credentials")
 
     #create a token
 
