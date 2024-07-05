@@ -28,6 +28,7 @@ class Investment(Base):
 
 class Vote(Base):
     __tablename__ = 'votes'
+    __table_args__ = {"schema": "public"}  # Omitir si no estás usando esquemas
     user_id = Column(Integer, ForeignKey('public.users.id',
                                           ondelete='CASCADE'), primary_key=True, nullable=False)
     investment_id = Column(Integer, ForeignKey('public.investments.id',
