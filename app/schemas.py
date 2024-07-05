@@ -50,7 +50,7 @@ class TokenData(BaseModel):
 
 class VoteBase(BaseModel):
     investment_id: int
-    dir: conint(le=1)
+    dir: conint(le=1) # type: ignore
     
 
     

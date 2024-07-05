@@ -1,5 +1,5 @@
 from .orm_database import Base
-from sqlalchemy import Column,Integer,String,Float,TIMESTAMP,ForeignKey,text, UniqueConstraint, func
+from sqlalchemy import Column,Integer,String,Float,TIMESTAMP,ForeignKey,func
 from sqlalchemy.orm import relationship
 
 class User(Base):

@@ -1,6 +1,5 @@
 from app import schemas
 from fastapi import status, HTTPException, Response, APIRouter, Depends, Query
-from ..config import database
 from typing import List, Optional
 from .. import oauth2
 from ..config import orm_models, orm_database
