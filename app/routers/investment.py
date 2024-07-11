@@ -4,11 +4,16 @@ from typing import List, Optional
 from .. import oauth2
 from ..config import orm_models, orm_database
 from sqlalchemy.orm import Session
+from ..controllers.investment import InvestmentHandler
+from ..services.investment import InvestmentService
+from ..config.repositories import InvestmentRepository
+
 
 router = APIRouter(
     prefix="/investments",
     tags=["Investments"]
 )
+
 
 @router.get("/", response_model=List[schemas.ResponseModelInvestment])
 def get_investments(
@@ -16,13 +21,16 @@ def get_investments(
     current_user: int = Depends(oauth2.get_current_user),
     search_filter: Optional[str] = Query(None, alias="investment_token")
 ):
-    query = db.query(orm_models.Investment)  # Utiliza el modelo ORM para construir la consulta
-    query = query.filter(orm_models.Investment.user_id == current_user["id"])  # Filtra por el usuario actual
+    
+    investment_repo = InvestmentRepository(db)
+    investment_service = InvestmentService(investment_repo)
+    investment_handler = InvestmentHandler(investment_service)
 
-    if search_filter:
-        query = query.filter(orm_models.Investment.token == search_filter)  # Aplica filtro adicional si es necesario
+    investments = investment_handler.get_all(search_filter)
 
-    investments = query.all()  # Ejecuta la consulta y recupera todos los resultados
+    if not investments:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="No Investments found.")    
 
     return investments
 

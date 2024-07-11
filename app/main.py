@@ -5,7 +5,8 @@ from .config.orm_database import get_db
 from .config import orm_models
 from .config.orm_database import engine
 
-# orm_models.Base.metadata.create_all(bind=engine) #uncomment to create the db tables if doesnt exists.
+orm_models.Base.metadata.drop_all(bind=engine)
+orm_models.Base.metadata.create_all(bind=engine) #This line will create the tables on Db if they doesnt exist.
 
 app = FastAPI()
 

@@ -21,32 +21,33 @@ class Database:
                 conn = psycopg2.connect(host=self.db_host, database=self.db_name, user=self.db_user, password=self.db_password,
                 cursor_factory=RealDictCursor)
                 cursor = conn.cursor()
-        
-                cursor.execute("""
-                                CREATE TABLE IF NOT EXISTS public.users (
-                                id serial4 NOT NULL,
-                                "name" varchar NOT NULL,
-                                email varchar NOT NULL,
-                                "password" varchar NOT NULL,
-                                created_at timestamptz NOT NULL DEFAULT now(),
-                                CONSTRAINT users_email_key UNIQUE (email),
-                                CONSTRAINT users_pkey PRIMARY KEY (id)
-                                );
-                                """)
-                conn.commit()
-                cursor.execute("""
-                                CREATE TABLE IF NOT EXISTS public.investments (
-                                id serial4 NOT NULL,
-                                user_id int NOT NULL,
-                                investment_name varchar NOT NULL,
-                                "token" varchar NULL,
-                                amount float4 NOT NULL,
-                                opening_at timestamptz NOT NULL DEFAULT now(),
-                                CONSTRAINT investments_pkey PRIMARY KEY (id),
-                                CONSTRAINT investments_fk FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
-                                );
-                            """)
-                conn.commit()
+
+                # DEPRECATED LOGIC TO CREATE TABLE ON FIRST APP EXECUTION.
+                # cursor.execute("""
+                #                 CREATE TABLE IF NOT EXISTS public.users (
+                #                 id serial4 NOT NULL,
+                #                 "name" varchar NOT NULL,
+                #                 email varchar NOT NULL,
+                #                 "password" varchar NOT NULL,
+                #                 created_at timestamptz NOT NULL DEFAULT now(),
+                #                 CONSTRAINT users_email_key UNIQUE (email),
+                #                 CONSTRAINT users_pkey PRIMARY KEY (id)
+                #                 );
+                #                 """)
+                # conn.commit()
+                # cursor.execute("""
+                #                 CREATE TABLE IF NOT EXISTS public.investments (
+                #                 id serial4 NOT NULL,
+                #                 user_id int NOT NULL,
+                #                 investment_name varchar NOT NULL,
+                #                 "token" varchar NULL,
+                #                 amount float4 NOT NULL,
+                #                 opening_at timestamptz NOT NULL DEFAULT now(),
+                #                 CONSTRAINT investments_pkey PRIMARY KEY (id),
+                #                 CONSTRAINT investments_fk FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
+                #                 );
+                #             """)
+                # conn.commit()
                 print("Database connection was succesfull!")
                 break
             except Exception as error:

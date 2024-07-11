@@ -2,6 +2,9 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, conint
 from datetime import datetime
 
+
+#TODO: EVALUATE POSSIBILITY OF RE USE THIS SCHEMAS BASE IN MODELS.PY
+
 class InvestmentBase(BaseModel):
     investment_name: str
     token: Optional[str] = None
@@ -16,7 +19,8 @@ class UpdateInvestment(BaseModel):
 class ResponseModelInvestment(InvestmentBase):
     id: int    
     opening_at: datetime
-    user_id: int
+    type: str
+    status: str
     class Config:
         orm_mode = True
 ##################################################### users 
