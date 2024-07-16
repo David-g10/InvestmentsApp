@@ -1,26 +1,44 @@
 from typing import Optional
 from pydantic import BaseModel, EmailStr, conint
 from datetime import datetime
+from .config.orm_models import InvestmentType, InvestmentIncomeType
 
-
-#TODO: EVALUATE POSSIBILITY OF RE USE THIS SCHEMAS BASE IN MODELS.PY
 
 class InvestmentBase(BaseModel):
-    investment_name: str
-    token: Optional[str] = None
     amount: float
+    income_type: InvestmentIncomeType
+    type: InvestmentType
+
+class StockMarketInvestment(InvestmentBase):
+    ticker = str
+    shares = float
+    broker: Optional[str] = None
+    commission: Optional[float] = None
 
 class CreateInvestment(InvestmentBase):
     pass
 
-class UpdateInvestment(BaseModel):
-    amount: float
+class CreateStockMarketInvestment(StockMarketInvestment):
+    pass
+
+class UpdateInvestment(InvestmentBase):
+    closed_at: Optional[datetime]
+    status: Optional[str]
+
+class UpdateStockMarketInvestment(StockMarketInvestment):
+    closed_at: Optional[datetime]
+    status: Optional[str] = None
 
 class ResponseModelInvestment(InvestmentBase):
     id: int    
     opening_at: datetime
-    type: str
-    status: str
+    class Config:
+        orm_mode = True
+
+class ResponseModelStockMarketInvestment(StockMarketInvestment):
+    id: int    
+    opening_at: datetime
+    
     class Config:
         orm_mode = True
 ##################################################### users 

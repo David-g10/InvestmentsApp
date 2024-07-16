@@ -1,3 +1,5 @@
+from fastapi import status, HTTPException
+
 from ..interfaces.investment_interface import IInvestment
 
 class InvestmentHandler():
@@ -18,5 +20,10 @@ class InvestmentHandler():
         return self.investment_service.get_investment_by_id()
     
     def get_all(self, search_filter=None):
-        return self.investment_service.get_investments(search_filter)
+        investments =  self.investment_service.get_investments(search_filter)
+
+        if not investments:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="No Investments found.")
+        return investments    
 

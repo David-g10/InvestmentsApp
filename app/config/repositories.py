@@ -1,27 +1,32 @@
 # repositories.py
 from sqlalchemy.orm import Session
-from .orm_models import Investment
 
-class InvestmentRepository:
-    def __init__(self, session: Session):
+class BaseRepository:
+    def __init__(self, session: Session, model):
         self.session = session
+        self.model = model
 
-    def add(self, investment: Investment):
-        self.session.add(investment)
+    def add(self, entity):
+        self.session.add(self.entity)
         self.session.commit()
-        return investment
+        return entity
 
-    def get_by_id(self, investment_id: int) -> Investment:
-        return self.session.query(Investment).filter(Investment.id == investment_id).one()
+    def get_by_id(self, entity_id: int):
+        return self.session.query(self.model).filter(self.model.id == entity_id).one()
     
     def get_all(self, search_filter=None):
-        query = self.session.query(Investment)
+        query = self.session.query(self.model)
+        
         if search_filter:
-            query = query.filter(Investment.type == search_filter)  # Aplica filtro adicional si es necesario
-
+            query = query.filter(self.model.type == search_filter)  # Aplica filtro adicional si es necesario
+            
         return query.all()
 
-    def remove(self, investment_id: int):
-        investment = self.session.query(Investment).filter(Investment.id == investment_id).one()
-        self.session.delete(investment)
+    def remove(self, entity_id: int):
+        entity = self.session.query(self.model).filter(self.model.id == entity_id).one()
+        self.session.delete(entity)
         self.session.commit()
+
+class InvestmentRepository(BaseRepository):
+    def __init__(self, session: Session, model):
+        super().__init__(session, model)

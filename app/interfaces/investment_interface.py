@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
 
+
+#TODO: add the input params as services methods.
 class IInvestment(ABC):
 
     @abstractmethod
-    def add_investment():
+    def add_investment(self, amount, income_type):
         pass
 
     @abstractmethod    
@@ -11,13 +13,13 @@ class IInvestment(ABC):
         pass
 
     @abstractmethod
-    def delete_investment():
+    def delete_investment(self, investment_id):
         pass
 
     @abstractmethod
-    def get_investment_by_id():
+    def get_investment_by_id(self, investment_id):
         pass
 
     @abstractmethod
-    def get_investments(search_filter=None):
+    def get_investments(self, search_filter=None):
         pass

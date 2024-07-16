@@ -5,8 +5,14 @@ from .. import oauth2
 from ..config import orm_models, orm_database
 from sqlalchemy.orm import Session
 from ..controllers.investment import InvestmentHandler
-from ..services.investment import InvestmentService
+from ..services.investment import InvestmentService, StockMarketService
 from ..config.repositories import InvestmentRepository
+from ..config.orm_models import Investment, StockMarketInvestment
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 
 
 router = APIRouter(
@@ -19,20 +25,44 @@ router = APIRouter(
 def get_investments(
     db: Session = Depends(orm_database.get_db),  # Dependencia para obtener la sesión de la base de datos
     current_user: int = Depends(oauth2.get_current_user),
-    search_filter: Optional[str] = Query(None, alias="investment_token")
+    search_filter: Optional[str] = Query(None, alias="income_type")
 ):
     
-    investment_repo = InvestmentRepository(db)
+    investment_repo = InvestmentRepository(session=db, model=Investment)
     investment_service = InvestmentService(investment_repo)
     investment_handler = InvestmentHandler(investment_service)
 
-    investments = investment_handler.get_all(search_filter)
-
-    if not investments:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="No Investments found.")    
+    investments = investment_handler.get_all(search_filter)  
 
     return investments
+
+# TODO: add the new endpoints based in specific types of investments as: cdt, bonds, stocks
+
+@router.get("/stock_market", response_model=List[schemas.ResponseModelStockMarketInvestment])
+def get_stock_market_investments(
+    db: Session = Depends(orm_database.get_db),
+    current_user: int = Depends(oauth2.get_current_user)
+):
+
+    investment_repo = InvestmentRepository(session=db, model=Investment)
+    investment_service = InvestmentService(investment_repo)
+    investment_handler = InvestmentHandler(investment_service)
+
+    investments = investment_handler.get_all()
+    
+    stock_repo = InvestmentRepository(session=db, model=StockMarketInvestment)
+    stock_service = StockMarketService(stock_repo)
+    stock_handler = InvestmentHandler(stock_service)
+
+    stocks = stock_handler.get_all()
+
+
+    for i in range(len(stocks)):
+        investments[i] =  dict(investments[i]) | dict(stocks[i])
+    # logger.debug(f"Stocks fetched: {stocks}")
+
+    return investments
+
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.ResponseModelInvestment)
 def add_investment(
