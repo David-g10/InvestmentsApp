@@ -27,6 +27,11 @@ class BaseRepository:
         self.session.delete(entity)
         self.session.commit()
 
+    def join_query(self, other_model):
+        query = self.session.query(self.model, other_model).join(other_model)
+        
+        return query
+
 class InvestmentRepository(BaseRepository):
     def __init__(self, session: Session, model):
         super().__init__(session, model)

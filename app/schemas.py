@@ -10,8 +10,8 @@ class InvestmentBase(BaseModel):
     type: InvestmentType
 
 class StockMarketInvestment(InvestmentBase):
-    ticker = str
-    shares = float
+    ticker: str
+    shares: float
     broker: Optional[str] = None
     commission: Optional[float] = None
 
@@ -41,6 +41,8 @@ class ResponseModelStockMarketInvestment(StockMarketInvestment):
     
     class Config:
         orm_mode = True
+        use_enum_values = True
+
 ##################################################### users 
 
 class UserBase(BaseModel):

@@ -1,3 +1,4 @@
+from app.config.orm_database import flatten_join
 from ..interfaces.investment_interface import IInvestment
 from ..config.repositories import InvestmentRepository
 from ..config.orm_models import Investment, StockMarketInvestment
@@ -59,7 +60,12 @@ class StockMarketService(IInvestment):
         return self.investment_repository.get_by_id(investment_id)
     
     def get_investments(self, search_filter=None):
-        return self.investment_repository.get_all(search_filter)
+        # Realizar el join entre Investment y StockMarketInvestment
+        join_query = self.investment_repository.join_query(Investment)
+        # Ejecutar la consulta y obtener los resultados
+        results = join_query.all()
+
+        return flatten_join(results)
 
     def close_investment():
         pass

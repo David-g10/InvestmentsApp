@@ -43,25 +43,14 @@ def get_stock_market_investments(
     db: Session = Depends(orm_database.get_db),
     current_user: int = Depends(oauth2.get_current_user)
 ):
-
-    investment_repo = InvestmentRepository(session=db, model=Investment)
-    investment_service = InvestmentService(investment_repo)
-    investment_handler = InvestmentHandler(investment_service)
-
-    investments = investment_handler.get_all()
     
     stock_repo = InvestmentRepository(session=db, model=StockMarketInvestment)
     stock_service = StockMarketService(stock_repo)
     stock_handler = InvestmentHandler(stock_service)
 
-    stocks = stock_handler.get_all()
-
-
-    for i in range(len(stocks)):
-        investments[i] =  dict(investments[i]) | dict(stocks[i])
-    # logger.debug(f"Stocks fetched: {stocks}")
-
-    return investments
+    stocks_investments = stock_handler.get_all()
+    
+    return stocks_investments
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.ResponseModelInvestment)
