@@ -39,7 +39,7 @@ class Investment(Base):
     user_id = Column(Integer, ForeignKey('public.users.id', ondelete='CASCADE'), nullable=False)
 
     user = relationship("User", back_populates="investments")
-    stock = relationship("StockMarketInvestment", back_populates="investment")
+    stock = relationship("StockMarketInvestment", back_populates="investment", uselist=False)
 
 class StockMarketInvestment(Base):
     __tablename__ = "stock_market_investments"

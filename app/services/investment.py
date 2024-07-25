@@ -3,6 +3,7 @@ from ..interfaces.investment_interface import IInvestment
 from ..config.repositories import InvestmentRepository
 from ..config.orm_models import Investment, StockMarketInvestment
 from sqlalchemy.exc import SQLAlchemyError
+from ..config.orm_database import obj_to_dict
 
 class InvestmentService(IInvestment):
     def __init__(self, investment_repository: InvestmentRepository):
@@ -28,24 +29,29 @@ class StockMarketService(IInvestment):
     def __init__(self, investment_repository: InvestmentRepository):
         self.investment_repository = investment_repository
 
-    def add_investment(self, amount, income_type, ticker, shares, broker=None, commission=None):
+    def add_investment(self, user_id, amount, income_type, type, ticker, shares, broker=None, commission=None):
     
         try:
             # Iniciar una transacción
             self.investment_repository.session.begin()
 
             # Crear y agregar la inversión general
-            new_investment = Investment(amount=amount, income_type=income_type)
+            new_investment = Investment(user_id=user_id, amount=amount, income_type=income_type, type=type)
             self.investment_repository.session.add(new_investment)
             self.investment_repository.session.flush()  # Esto asegura que el investment.id esté disponible
+            
 
             # Crear y agregar la información específica de la acción
             new_stock_investment = StockMarketInvestment(ticker=ticker, shares=shares, broker=broker, commission=commission)
+            new_investment.stock = new_stock_investment
             self.investment_repository.session.add(new_stock_investment)
 
             # Confirmar la transacción
             self.investment_repository.session.commit()
-            return new_stock_investment
+            # Refrescar el objeto para asegurar que contiene cualquier actualización de la base de datos
+            self.investment_repository.session.refresh(new_investment)
+            
+            return obj_to_dict(new_investment)|obj_to_dict(new_stock_investment)
         
         except SQLAlchemyError as e:
             # Si hay un error, revertir la transacción

@@ -7,8 +7,15 @@ class InvestmentHandler():
     def __init__(self, investment_service: IInvestment) -> None:
         self.investment_service = investment_service
 
-    def add(self):
-        return self.investment_service.add_investment()
+    def add(self, *args):
+        try:
+            print(*args)
+            new_stock_investment = self.investment_service.add_investment(*args)
+        except Exception as e:
+            print(e)
+            raise HTTPException(status_code=400, detail=f"Error al guardar en la base de datos: {str(e)}") from e
+        return new_stock_investment
+        
     
     def close(self):
         return self.investment_service.close_investment()

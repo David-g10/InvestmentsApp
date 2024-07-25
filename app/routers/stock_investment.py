@@ -16,55 +16,41 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 router = APIRouter(
-    prefix="/investments",
-    tags=["Investments"]
+    prefix="/stockinvestments",
+    tags=["StockInvestments"]
 )
 
-
-@router.get("/", response_model=List[schemas.ResponseModelInvestment])
-def get_investments(
-    db: Session = Depends(orm_database.get_db),  # Dependencia para obtener la sesión de la base de datos
-    current_user: int = Depends(oauth2.get_current_user),
-    search_filter: Optional[str] = Query(None, alias="income_type")
+@router.get("/stock_market", response_model=List[schemas.ResponseModelStockMarketInvestment])
+def get_stock_market_investments(
+    db: Session = Depends(orm_database.get_db),
+    current_user: int = Depends(oauth2.get_current_user)
 ):
     
-    investment_repo = InvestmentRepository(session=db, model=Investment)
-    investment_service = InvestmentService(investment_repo)
-    investment_handler = InvestmentHandler(investment_service)
+    stock_repo = InvestmentRepository(session=db, model=StockMarketInvestment)
+    stock_service = StockMarketService(stock_repo)
+    stock_handler = InvestmentHandler(stock_service)
 
-    investments = investment_handler.get_all(search_filter)  
+    stocks_investments = stock_handler.get_all()
+    
+    return stocks_investments
 
-    return investments
 
-# @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.ResponseModelInvestment)
-# def add_investment(
-#     investment: schemas.CreateInvestment,
-#     db: Session = Depends(orm_database.get_db),
-#     current_user: int = Depends(oauth2.get_current_user)
-# ):
-#     # Crear el objeto del modelo ORM
-#     new_investment = orm_models.Investment(
-#         user_id=current_user["id"],
-#         investment_name=investment.investment_name,
-#         token=investment.token,
-#         amount=investment.amount,
-#     )
-#     # new_investment = orm_models.Investment(**investment.dict())
-#     # Agregar el objeto a la sesión
-#     db.add(new_investment)
-    
-#     # Intentar hacer commit de los cambios
-#     try:
-#         db.commit()
-#     except Exception as e:
-#         db.rollback()  # Si hay un error, hacer rollback
-#         raise HTTPException(status_code=400, detail=f"Error al guardar en la base de datos: {str(e)}")
-    
-#     # Refrescar el objeto para asegurar que contiene cualquier actualización de la base de datos
-#     db.refresh(new_investment)
-    
-#     # Devolver el objeto recién creado y guardado
-#     return new_investment
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.ResponseModelStockMarketInvestment)
+def add_stock_investment(
+    investment: schemas.CreateStockMarketInvestment,
+    db: Session = Depends(orm_database.get_db),
+    current_user: int = Depends(oauth2.get_current_user)
+):
+
+    new_investment = investment.dict()
+
+    stock_repo = InvestmentRepository(session=db, model=StockMarketInvestment)
+    stock_service = StockMarketService(stock_repo)
+    stock_handler = InvestmentHandler(stock_service)
+
+    new_stock_investment = stock_handler.add(current_user['id'], *new_investment.values())
+    # Devolver el objeto recién creado y guardado
+    return new_stock_investment
 
 # @router.get("/{id}", response_model=schemas.ResponseModelInvestment)
 # def get_investment(

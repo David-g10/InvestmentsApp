@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends
-from .routers import investment,user, auth, vote
+from .routers import investment,user, auth, vote, stock_investment
 from sqlalchemy.orm import Session
 from .config.orm_database import get_db
 from .config import orm_models
@@ -10,6 +10,7 @@ orm_models.Base.metadata.create_all(bind=engine) #This line will create the tabl
 
 app = FastAPI()
 
+app.include_router(stock_investment.router)
 app.include_router(investment.router)
 app.include_router(user.router)
 app.include_router(auth.router)
