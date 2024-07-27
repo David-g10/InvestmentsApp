@@ -1,13 +1,13 @@
 from app import schemas
-from fastapi import status, HTTPException, Response, APIRouter, Depends, Query
-from typing import List, Optional
+from fastapi import Response, status, APIRouter, Depends
+from typing import List
 from .. import oauth2
-from ..config import orm_models, orm_database
+from ..config import orm_database
 from sqlalchemy.orm import Session
 from ..controllers.investment import InvestmentHandler
-from ..services.investment import InvestmentService, StockMarketService
+from ..services.investment import StockMarketService
 from ..config.repositories import InvestmentRepository
-from ..config.orm_models import Investment, StockMarketInvestment
+from ..config.orm_models import StockMarketInvestment
 import logging
 
 logger = logging.getLogger(__name__)
@@ -66,27 +66,22 @@ def add_stock_investment(
     return new_stock_investment
 
 
+@router.delete("/{stock_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_investment(
+    stock_id: int,
+    db: Session = Depends(orm_database.get_db),
+    current_user: int = Depends(oauth2.get_current_user)
+):
 
-# @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-# def delete_investment(
-#     id: int,
-#     db: Session = Depends(orm_database.get_db),
-#     current_user: int = Depends(oauth2.get_current_user)
-# ):
-#     # Buscar la inversión por ID
-#     investment = db.query(orm_models.Investment).filter(orm_models.Investment.id == id).first()
+    stock_repo = InvestmentRepository(session=db, model=StockMarketInvestment)
+    stock_service = StockMarketService(stock_repo)
+    stock_handler = InvestmentHandler(stock_service)
 
-#     if not investment:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Investment with id {id} does not exist.")
+    _ = stock_handler.get_by_id(stock_id, current_user)
+    stock_handler.delete(stock_id)
 
-#     if current_user["id"] != investment.user_id:
-#         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to perform requested action.")
 
-#     # Eliminar la inversión si todo está correcto
-#     db.delete(investment)
-#     db.commit()
 
-#     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 # @router.put("/{id}", response_model=schemas.ResponseModelInvestment)
 # def update_investment(

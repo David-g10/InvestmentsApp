@@ -20,12 +20,16 @@ class InvestmentHandler():
     def close(self):
         return self.investment_service.close_investment()
 
-    def delete(self):
-        return self.investment_service.delete_investment()
+    def delete(self, id):
+
+        return self.investment_service.delete_investment(id)
     
     def get_by_id(self, investment_id, current_user=None):
-
-        investment = self.investment_service.get_investment_by_id(investment_id)[0]
+        try:
+            investment = self.investment_service.get_investment_by_id(investment_id)[0]
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail=f"{e}")
  
         # Verificar si la inversión existe
         if not investment:
