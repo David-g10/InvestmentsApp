@@ -12,7 +12,8 @@ class BaseRepository:
         return entity
 
     def get_by_id(self, entity_id: int):
-        return self.session.query(self.model).filter(self.model.id == entity_id).one()
+        query = self.session.query(self.model).filter(self.model.id == entity_id).one()
+        return query
     
     def get_all(self, search_filter=None):
         query = self.session.query(self.model)
@@ -27,9 +28,11 @@ class BaseRepository:
         self.session.delete(entity)
         self.session.commit()
 
-    def join_query(self, other_model):
-        query = self.session.query(self.model, other_model).join(other_model)
-        
+    def join_query(self, other_model, on_clause, *columns):
+        if columns:
+            query = self.session.query(*columns).select_from(self.model).join(other_model, on_clause)
+        else:
+            query = self.session.query(self.model, other_model).select_from(self.model).join(other_model, on_clause)
         return query
 
 class InvestmentRepository(BaseRepository):

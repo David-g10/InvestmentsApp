@@ -38,7 +38,8 @@ class ResponseModelInvestment(InvestmentBase):
         orm_mode = True
 
 class ResponseModelStockMarketInvestment(StockMarketInvestment):
-    id: int    
+    id: int
+    investment_id: int
     opening_at: datetime
     
     class Config:

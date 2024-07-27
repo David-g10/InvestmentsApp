@@ -23,8 +23,20 @@ class InvestmentHandler():
     def delete(self):
         return self.investment_service.delete_investment()
     
-    def get_by_id(self):
-        return self.investment_service.get_investment_by_id()
+    def get_by_id(self, investment_id, current_user=None):
+
+        investment = self.investment_service.get_investment_by_id(investment_id)[0]
+ 
+        # Verificar si la inversión existe
+        if not investment:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail=f"Investment with id: {investment_id} was not found.")
+
+        # Verificar si el usuario actual tiene permiso para ver esta inversión
+        if current_user["id"] != investment["user_id"]:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
+                                detail="Not authorized to perform requested action.")
+        return investment
     
     def get_all(self, search_filter=None):
         investments =  self.investment_service.get_investments(search_filter)

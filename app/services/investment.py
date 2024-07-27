@@ -62,16 +62,28 @@ class StockMarketService(IInvestment):
     def delete_investment(self, investment_id):
         self.investment_repository.remove(investment_id)
 
-    def get_investment_by_id(self, investment_id):
-        return self.investment_repository.get_by_id(investment_id)
+    def get_investment_by_id(self, stock_id):
+
+        # Obtener el registro por ID
+        stock_market_investment = self.investment_repository.get_by_id(stock_id)
+
+        # Realizar el join con Investment y seleccionar solo el campo user_id
+        join_query = self.investment_repository.join_query(
+            Investment, 
+            Investment.id == stock_market_investment.investment_id
+        ).filter(StockMarketInvestment.id == stock_id)
+
+        results = flatten_join(join_query.all())
+        
+        return results
     
     def get_investments(self, search_filter=None):
         # Realizar el join entre Investment y StockMarketInvestment
-        join_query = self.investment_repository.join_query(Investment)
+        join_query = self.investment_repository.join_query(Investment, Investment.id == StockMarketInvestment.investment_id)
         # Ejecutar la consulta y obtener los resultados
-        results = join_query.all()
-
-        return flatten_join(results)
+        results = flatten_join(join_query.all())
+        
+        return results
 
     def close_investment():
         pass
