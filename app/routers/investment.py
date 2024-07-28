@@ -1,15 +1,14 @@
 from app import schemas
-from fastapi import status, HTTPException, Response, APIRouter, Depends, Query
+from fastapi import status, APIRouter, Depends, Query
 from typing import List, Optional
-
 from app.config import database
 from .. import oauth2
-from ..config import orm_models, orm_database
+from ..config import orm_database
 from sqlalchemy.orm import Session
 from ..controllers.investment import InvestmentHandler
-from ..services.investment import InvestmentService, StockMarketService
+from ..services.investment import InvestmentService
 from ..config.repositories import InvestmentRepository
-from ..config.orm_models import Investment, StockMarketInvestment
+from ..config.orm_models import Investment
 import logging
 
 logger = logging.getLogger(__name__)
