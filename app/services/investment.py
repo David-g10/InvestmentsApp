@@ -15,7 +15,7 @@ class InvestmentService(IInvestment):
 
     def delete_investment(self, investment_id):
         self.investment_repository.remove(investment_id)
-
+        
     def get_investment_by_id(self, investment_id):
         return self.investment_repository.get_by_id(investment_id)
     

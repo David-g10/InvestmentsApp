@@ -1,6 +1,8 @@
 from app import schemas
 from fastapi import status, HTTPException, Response, APIRouter, Depends, Query
 from typing import List, Optional
+
+from app.config import database
 from .. import oauth2
 from ..config import orm_models, orm_database
 from sqlalchemy.orm import Session
@@ -35,6 +37,15 @@ def get_investments(
     investments = investment_handler.get_all(search_filter)  
 
     return investments
+
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(id, current_user: int = Depends(oauth2.get_current_user)):
+    conn, cursor = database.Database().connect()
+
+    cursor.execute(f"""DELETE FROM investments WHERE id={id} """)
+    conn.commit()
+
 
 # @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.ResponseModelInvestment)
 # def add_investment(

@@ -66,23 +66,6 @@ def add_stock_investment(
     return new_stock_investment
 
 
-@router.delete("/{stock_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_investment(
-    stock_id: int,
-    db: Session = Depends(orm_database.get_db),
-    current_user: int = Depends(oauth2.get_current_user)
-):
-
-    stock_repo = InvestmentRepository(session=db, model=StockMarketInvestment)
-    stock_service = StockMarketService(stock_repo)
-    stock_handler = InvestmentHandler(stock_service)
-
-    _ = stock_handler.get_by_id(stock_id, current_user)
-    stock_handler.delete(stock_id)
-
-
-
-
 # @router.put("/{id}", response_model=schemas.ResponseModelInvestment)
 # def update_investment(
 #     id: int,
