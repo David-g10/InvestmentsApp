@@ -89,6 +89,7 @@ uvicorn = "0.18.3"
 watchfiles = "0.18.0"
 websockets = "10.4"
 sqlalchemy = "^2.0.31"
+pytest = "^8.3.2"
 
 [build-system]
 requires = ["poetry-core"]
