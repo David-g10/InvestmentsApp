@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     POSTGRES_USER : str
     POSTGRES_PASSWORD : str
 
+    ENV: str
     DATABASE_HOST : str
     DATABASE_NAME : str
     DATABASE_USER : str

@@ -7,8 +7,9 @@ class Database:
 #    def __init__(self) -> None:
 #        self.conn = self.connect()
 #
+    env = settings.ENV
     db_host = settings.DATABASE_HOST
-    db_name = settings.DATABASE_NAME
+    db_name = f'{settings.DATABASE_NAME}_{env}' if env else settings.DATABASE_NAME
     db_user = settings.DATABASE_USER
     db_password = settings.DATABASE_PASSWORD
 
