@@ -22,6 +22,16 @@ def create_user(user: schemas.CreateUser):
 
     return new_user
 
+@router.get('/') #, status_code=status.HTTP_200_OK
+def get_users():
+    conn, cursor = database.Database().connect()
+    cursor.execute("""SELECT id,name,email,created_at FROM users""")
+    users = cursor.fetchall()
+    if not users:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"users were not found.")
+    return users
+
 @router.get('/{id}')
 def get_user(id: int):
     conn, cursor = database.Database().connect()
