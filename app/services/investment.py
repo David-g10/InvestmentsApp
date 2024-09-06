@@ -30,7 +30,7 @@ class StockMarketService(IInvestment):
         self.investment_repository = investment_repository
 
     def add_investment(self, user_id, amount, income_type, type, ticker, shares, broker=None, commission=None):
-    
+        self.investment_repository.session.close()
         try:
             # Iniciar una transacción
             self.investment_repository.session.begin()
@@ -39,30 +39,62 @@ class StockMarketService(IInvestment):
             new_investment = Investment(user_id=user_id, amount=amount, income_type=income_type, type=type)
             self.investment_repository.session.add(new_investment)
             self.investment_repository.session.flush()  # Esto asegura que el investment.id esté disponible
-            
 
             # Crear y agregar la información específica de la acción
             new_stock_investment = StockMarketInvestment(ticker=ticker, shares=shares, broker=broker, commission=commission)
             new_investment.stock = new_stock_investment
             self.investment_repository.session.add(new_stock_investment)
-
             # Confirmar la transacción
             self.investment_repository.session.commit()
             # Refrescar el objeto para asegurar que contiene cualquier actualización de la base de datos
-            self.investment_repository.session.refresh(new_investment)
-            
-            return obj_to_dict(new_investment)|obj_to_dict(new_stock_investment)
+            self.investment_repository.session.refresh(new_investment)            
         
+            return obj_to_dict(new_investment)|obj_to_dict(new_stock_investment)
         except SQLAlchemyError as e:
             # Si hay un error, revertir la transacción
             self.investment_repository.session.rollback()
             raise e
+        finally:
+            self.investment_repository.session.close()
 
+
+
+    def add_investments(self, entities_list):
+        investments = []
+        for entity in entities_list:
+            try:
+                # Iniciar una transacción
+                self.investment_repository.session.begin()
+
+                # Crear y agregar la inversión general
+                new_investment = Investment(user_id=entity['user_id'], amount=entity['amount'], income_type=entity['income_type'], type=entity['type'])
+                self.investment_repository.session.add(new_investment)
+                self.investment_repository.session.flush()  # Esto asegura que el investment.id esté disponible
+                
+
+                # Crear y agregar la información específica de la acción
+                new_stock_investment = StockMarketInvestment(ticker=entity['ticker'], shares=entity['shares'], broker=entity['broker'], commission=entity['commission'])
+                new_investment.stock = new_stock_investment
+                self.investment_repository.session.add(new_stock_investment)
+
+                # Confirmar la transacción
+                self.investment_repository.session.commit()
+                # Refrescar el objeto para asegurar que contiene cualquier actualización de la base de datos
+                self.investment_repository.session.refresh(new_investment)
+                
+                investments.append(obj_to_dict(new_investment)|obj_to_dict(new_stock_investment))
+            except SQLAlchemyError as e:
+                # Si hay un error, revertir la transacción
+                self.investment_repository.session.rollback()
+                raise e
+            finally:
+                self.investment_repository.session.close()
+        return investments    
 
     def delete_investment(self, investment_id):
         self.investment_repository.remove(investment_id)
 
-    def get_investment_by_id(self, stock_id):
+    def get_investment_by_id(self, stock_id, flatten=True):
 
         # Obtener el registro por ID
         stock_market_investment = self.investment_repository.get_by_id(stock_id)
@@ -73,15 +105,19 @@ class StockMarketService(IInvestment):
             Investment.id == stock_market_investment.investment_id
         ).filter(StockMarketInvestment.id == stock_id)
 
-        results = flatten_join(join_query.all())
+        results = join_query.all()
+        if flatten:
+            results = flatten_join(join_query.all())
         
         return results
     
-    def get_investments(self, search_filter=None):
+    def get_investments(self, search_filter=None, flatten=True):
         # Realizar el join entre Investment y StockMarketInvestment
         join_query = self.investment_repository.join_query(Investment, Investment.id == StockMarketInvestment.investment_id)
         # Ejecutar la consulta y obtener los resultados
-        results = flatten_join(join_query.all())
+        results = join_query.all()
+        if flatten:
+            results = flatten_join(join_query.all())
         
         return results
 

@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from .config.orm_database import get_db
 from .config import orm_models
 from .config.orm_database import engine
+import uvicorn
 
 # orm_models.Base.metadata.drop_all(bind=engine)
 orm_models.Base.metadata.create_all(bind=engine) #This line will create the tables on Db if they doesnt exist.
@@ -25,3 +26,6 @@ def root():
 def test(db: Session = Depends(get_db)):
     users = db.query(orm_models.User).all()
     return {"data": users}
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

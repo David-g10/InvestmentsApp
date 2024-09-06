@@ -9,13 +9,20 @@ class InvestmentHandler():
 
     def add(self, *args):
         try:
-            print(*args)
+            # print(*args)
             new_stock_investment = self.investment_service.add_investment(*args)
+        except Exception as e:
+            # print(e)
+            raise HTTPException(status_code=400, detail=f"Error al guardar en la base de datos: {str(e)}") from e
+        return new_stock_investment
+
+    def add_all(self, entities_list):
+        try:
+            new_stock_investments = self.investment_service.add_investments(entities_list)
         except Exception as e:
             print(e)
             raise HTTPException(status_code=400, detail=f"Error al guardar en la base de datos: {str(e)}") from e
-        return new_stock_investment
-        
+        return new_stock_investments    
     
     def close(self):
         return self.investment_service.close_investment()
@@ -46,8 +53,8 @@ class InvestmentHandler():
                                 detail="Not authorized to perform requested action.")
         return investment
     
-    def get_all(self, search_filter=None):
-        investments =  self.investment_service.get_investments(search_filter)
+    def get_all(self, search_filter=None, flatten=True):
+        investments =  self.investment_service.get_investments(search_filter, flatten=flatten)
 
         if not investments:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,

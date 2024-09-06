@@ -10,8 +10,8 @@ class InvestmentBase(BaseModel):
     type: InvestmentType
 
 class StockMarketInvestment(InvestmentBase):
-    income_type: InvestmentIncomeType = 'VARIABLE'
-    type:InvestmentType = 'BURSATIL'
+    income_type: InvestmentIncomeType = InvestmentIncomeType.VARIABLE
+    type:InvestmentType = InvestmentType.BURSATIL
     ticker: str
     shares: float
     broker: Optional[str] = None

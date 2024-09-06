@@ -13,6 +13,7 @@ class BaseRepository:
         self.session.commit()
         return entity
 
+         
     def get_by_id(self, entity_id: int):
         query = self.session.query(self.model).filter(self.model.id == entity_id).one()
         return query
