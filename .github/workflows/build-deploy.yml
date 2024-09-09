@@ -15,5 +15,33 @@ jobs:
       - name: pulling(Checkout) git repo.
         uses: actions/checkout@v3
       
-      - name: Say hi to user
-        run: echo "Hi User"
+      - name: Set up Python version 3.10
+        uses: actions/setup-python@v2
+        with:
+            python-version: 3.10
+      
+    #----------------------------------------------
+    #  -----  install & configure poetry  -----
+    #----------------------------------------------
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          virtualenvs-path: .venv
+          installer-parallel: true    
+
+      #----------------------------------------------
+      # install dependencies
+      #----------------------------------------------
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+
+      #----------------------------------------------
+      #              run test suite
+      #----------------------------------------------
+      - name: Run tests
+        run: | # Pipe character allows us to run multiple commands.
+          source .venv/bin/activate
+          pytest tests/
+          coverage report
