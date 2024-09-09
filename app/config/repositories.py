@@ -1,6 +1,6 @@
 # repositories.py
 from sqlalchemy.orm import Session
-
+from sqlalchemy import update
 from app.config.orm_database import obj_to_dict
 
 class BaseRepository:
@@ -33,6 +33,17 @@ class BaseRepository:
         self.session.delete(entity)
         self.session.commit()
 
+    def update(self, entity_id: int, data):
+
+        # update
+        entity = update(self.model).values(data.__dict__).where(self.model.id == entity_id).returning(self.model)
+        self.session.execute(entity)
+        self.session.commit()
+  
+        entity = self.get_by_id(entity_id)
+        print(entity)
+        
+        return entity
 
     def join_query(self, other_model, on_clause, *columns):
         if columns:

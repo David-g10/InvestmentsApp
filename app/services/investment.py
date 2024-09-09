@@ -93,6 +93,9 @@ class StockMarketService(IInvestment):
 
     def delete_investment(self, investment_id):
         self.investment_repository.remove(investment_id)
+    
+    def update_investment(self, investment_id, data):
+        return self.investment_repository.update(investment_id, data)
 
     def get_investment_by_id(self, stock_id, flatten=True):
 

@@ -23,3 +23,7 @@ class IInvestment(ABC):
     @abstractmethod
     def get_investments(self, search_filter=None):
         pass
+
+    @abstractmethod
+    def update_investment(self, search_filter=None):
+        pass

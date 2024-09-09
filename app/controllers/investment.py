@@ -30,11 +30,7 @@ class InvestmentHandler():
     def delete(self, investment_id, current_user=None):
         
         investment = self.get_by_id(investment_id, current_user)
-
-        if not investment:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail=f"Fallo encontrando la inversion con id: {investment_id}")            
-        
+              
         self.investment_service.delete_investment(investment_id)
     
     def get_by_id(self, investment_id, current_user=None):
@@ -62,4 +58,12 @@ class InvestmentHandler():
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail="No Investments found.")
         return investments    
+    
+    def update(self, investment_id, data, current_user=None):
+        
+        investment = self.get_by_id(investment_id, current_user)         
+        
+        updated_investment = self.investment_service.update_investment(investment_id, data)
+        return updated_investment
+
 

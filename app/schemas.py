@@ -27,9 +27,8 @@ class UpdateInvestment(InvestmentBase):
     closed_at: Optional[datetime]
     status: Optional[str]
 
-class UpdateStockMarketInvestment(StockMarketInvestment):
-    closed_at: Optional[datetime]
-    status: Optional[str] = None
+class UpdateStockMarketInvestment(BaseModel):
+    broker: Optional[str]
 
 class ResponseModelInvestment(InvestmentBase):
     id: int    

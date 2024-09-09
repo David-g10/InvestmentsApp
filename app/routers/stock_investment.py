@@ -80,27 +80,17 @@ def delete_investment(
     
     stock_handler.delete(id, current_user)
 
-# @router.put("/{id}", response_model=schemas.ResponseModelInvestment)
-# def update_investment(
-#     id: int,
-#     investment_data: schemas.UpdateInvestment,
-#     db: Session = Depends(orm_database.get_db),
-#     current_user: int = Depends(oauth2.get_current_user)
-# ):
-#     # Buscar la inversión por ID
-#     investment = db.query(orm_models.Investment).filter(orm_models.Investment.id == id).first()
+@router.put("/{id}", status_code=status.HTTP_200_OK)
+def update_investment(
+    id: int,
+    investment_data: schemas.UpdateStockMarketInvestment,
+    db: Session = Depends(orm_database.get_db),
+    current_user: int = Depends(oauth2.get_current_user)
+):
 
-#     if not investment:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Investment with id {id} does not exist.")
-
-#     if current_user["id"] != investment.user_id:
-#         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to perform requested action.")
-
-#     # Actualizar los campos necesarios
-#     if investment_data.amount is not None:
-#         investment.amount = investment_data.amount
-
-#     db.commit()
-#     db.refresh(investment)
-
-#     return investment
+    stock_repo = InvestmentRepository(session=db, model=StockMarketInvestment)
+    stock_service = StockMarketService(stock_repo)
+    stock_handler = InvestmentHandler(stock_service)
+    
+    updated_stock_investment = stock_handler.update(id, investment_data, current_user)
+    return updated_stock_investment

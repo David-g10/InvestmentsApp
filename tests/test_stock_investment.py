@@ -80,3 +80,41 @@ def test_delete_other_user_investment(authorized_client, test_user, test_stock_i
         f"/stockinvestments/{test_stock_investment[2][0].id}"
     )
     assert res.status_code == 403
+
+def test_update_stock_investment(authorized_client, test_user, test_stock_investment):
+    new_data = {"broker":"XTM"}
+    
+    res = authorized_client.put(
+        f"/stockinvestments/{test_stock_investment[0][0].id}",
+        json=new_data
+    )
+
+    updated_stock_investment = schemas.UpdateStockMarketInvestment(**res.json())
+
+    assert res.status_code == 200
+    assert updated_stock_investment.broker == new_data["broker"]
+
+def test_update_other_user_investment(authorized_client, test_user, test_stock_investment):
+    new_data = {"broker":"XTM"}
+    res = authorized_client.put(
+        f"/stockinvestments/{test_stock_investment[2][0].id}",
+        json=new_data
+    )
+    assert res.status_code == 403    
+
+
+def test_unauthorized_user_update_investment(client, test_user, test_stock_investment):
+    new_data = {"broker":"XTM"}
+    res = client.put(
+        f"/stockinvestments/{test_stock_investment[0][0].id}",
+        json=new_data
+    )
+    assert res.status_code == 401
+
+def test_update_investment_non_exist(authorized_client, test_user, test_stock_investment):
+    new_data = {"broker":"XTM"}
+    res = authorized_client.put(
+        f"/stockinvestments/99999999999",
+        json=new_data
+    )
+    assert res.status_code == 404  
