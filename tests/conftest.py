@@ -63,6 +63,16 @@ def test_user(client):
     new_user['password'] = user_data['password']
     return new_user
 
+@pytest.fixture
+def test_user2(client):
+    user_data = {"name":"yaz2","email":"yaz2@example.com", "password":"1234"}
+    res = client.post('/users/', json=user_data)
+
+    assert res.status_code == 201
+    new_user = res.json()
+    new_user['password'] = user_data['password']
+    return new_user
+
 
 @pytest.fixture
 def token(test_user):
@@ -77,7 +87,7 @@ def authorized_client(client, token):
     return client
 
 @pytest.fixture
-def test_stock_investment(test_user, session):
+def test_stock_investment(test_user, test_user2, session):
     stock_investment_data = [{
                             "user_id":test_user['id'],
                             "amount": 100,
@@ -97,6 +107,16 @@ def test_stock_investment(test_user, session):
                             "shares": 0.2,
                             "broker": "Hapi",
                             "commission": 1
+                            },
+                            {
+                            "user_id":test_user2['id'],
+                            "amount": 500,
+                            "income_type": orm_models.InvestmentIncomeType.VARIABLE,
+                            "type": "BURSATIL",
+                            "ticker": "AMZ",
+                            "shares": 2,
+                            "broker": "IB",
+                            "commission": 10
                             }]
     
     stock_repo = InvestmentRepository(session=session, model=orm_models.StockMarketInvestment)

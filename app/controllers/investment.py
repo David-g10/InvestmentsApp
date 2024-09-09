@@ -27,13 +27,15 @@ class InvestmentHandler():
     def close(self):
         return self.investment_service.close_investment()
 
-    def delete(self, id):
-        try:
-            self.investment_service.delete_investment(id)
-        except Exception as e:
+    def delete(self, investment_id, current_user=None):
+        
+        investment = self.get_by_id(investment_id, current_user)
+
+        if not investment:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail=f"Fallo encontrando la inversion con id: {id}: {e}")            
- 
+                                detail=f"Fallo encontrando la inversion con id: {investment_id}")            
+        
+        self.investment_service.delete_investment(investment_id)
     
     def get_by_id(self, investment_id, current_user=None):
         try:

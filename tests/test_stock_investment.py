@@ -55,3 +55,28 @@ def test_unauthorized_user_create_stock_investments(client, test_stock_investmen
     res = client.post("/stockinvestments/", json={"amount":10 ,"income_type":"VARIABLE","type":"BURSATIL", "ticker":"GO", "shares":5})
 
     assert res.status_code == 401
+
+def test_unauthorized_user_delete_investment(client, test_user, test_stock_investment):
+    res = client.delete(
+        f"/stockinvestments/{test_stock_investment[0][0].id}"
+    )
+
+    assert res.status_code == 401
+
+def test_delete_investment_success(authorized_client, test_user, test_stock_investment):
+    res = authorized_client.delete(
+        f"/stockinvestments/{test_stock_investment[0][0].id}"
+    )
+    assert res.status_code == 204 
+
+def test_delete_investment_non_exist(authorized_client, test_user, test_stock_investment):
+    res = authorized_client.delete(
+        f"/stockinvestments/99999999999"
+    )
+    assert res.status_code == 404    
+
+def test_delete_other_user_investment(authorized_client, test_user, test_stock_investment):
+    res = authorized_client.delete(
+        f"/stockinvestments/{test_stock_investment[2][0].id}"
+    )
+    assert res.status_code == 403

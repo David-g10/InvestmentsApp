@@ -39,7 +39,7 @@ def get_investments(
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(id, current_user: int = Depends(oauth2.get_current_user)):
+def delete_investment(id, current_user: int = Depends(oauth2.get_current_user)):
     conn, cursor = database.Database().connect()
 
     cursor.execute(f"""DELETE FROM investments WHERE id={id} """)

@@ -30,7 +30,6 @@ class BaseRepository:
         entity = self.session.query(self.model).filter(self.model.id == entity_id).one()
 
         print(obj_to_dict(entity))
-        print(entity, "*********************************************")
         self.session.delete(entity)
         self.session.commit()
 
