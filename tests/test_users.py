@@ -24,6 +24,7 @@ def test_get_user(client, test_user):
 
 def test_login_user(client, test_user):
     res = client.post('/login', data={'username': test_user['email'], 'password':test_user['password']})
+    print(res.json())
     login_res = schemas.Token(**res.json())
     payload = jwt.decode(login_res.access_token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
     id: str =  payload.get("user_id")
