@@ -55,3 +55,11 @@ class BaseRepository:
 class InvestmentRepository(BaseRepository):
     def __init__(self, session: Session, model):
         super().__init__(session, model)
+
+class UserRepository(BaseRepository):
+    def __init__(self, session: Session, model):
+        super().__init__(session, model)
+
+    def get_by_email(self, user_email: str):
+        query = self.session.query(self.model).filter(self.model.email == user_email).one()
+        return query
