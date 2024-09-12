@@ -79,5 +79,5 @@ jobs:
         run: | # Pipe character allows us to run multiple commands.
           source .venv/bin/activate
           export PYTHONPATH="$PWD:$PYTHONPATH"  # Agrega el directorio del proyecto al PYTHONPATH
-          pytest
+          coverage run -m pytest
           coverage report

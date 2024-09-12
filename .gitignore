@@ -7,3 +7,4 @@ app/routers/__pycache__/
 .env
 fastapi-investments.postman_collection.json
 .vscode/
+.coverage
