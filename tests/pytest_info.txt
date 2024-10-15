@@ -1,0 +1,9 @@
+commands and params:
+
+pytest --disable-warnings -v(verbose, ver info de cada test individual) -s(permite ver string o sea prints que hay dentro de los test) path(optional, si solo deseo ejecutar un test en especifico) -x (decirle a pytest que pare en cuanto el primer test falle)
+
+pytest --disable-warnings -v -s -x 
+
+extras:
+pytest --fixtures  # show available builtin function arguments
+pytest --maxfail=2  # stop after two failures
